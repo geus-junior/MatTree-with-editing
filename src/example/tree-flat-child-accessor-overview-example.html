@@ -1,0 +1,121 @@
+<div style="display: flex; align-items: center; justify-content: flex-end">
+  <button matButton="outlined" (click)="addSection()">
+    <mat-icon>add</mat-icon>
+    <small>Adicionar seção</small>
+  </button>
+</div>
+
+<mat-tree #tree [dataSource]="dataSource()" [childrenAccessor]="childrenAccessor">
+  <!-- Nó pai -->
+  <mat-tree-node
+    *matTreeNodeDef="let node;when: hasPotentialChild"
+    matTreeNodePadding
+    [cdkTreeNodeTypeaheadLabel]="node.description"
+  >
+    <button
+      mat-icon-button
+      disabled
+      *ngIf="(childrenAccessor(node)?.length ?? 0) <= 0"
+    ></button>
+    <button
+      mat-icon-button
+      matTreeNodeToggle
+      *ngIf="(childrenAccessor(node)?.length ?? 0) > 0"
+      [attr.aria-label]="'Toggle ' + node.description"
+    >
+      <mat-icon class="mat-icon-rtl-mirror">
+        {{tree.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+      </mat-icon>
+    </button>
+    
+    @if(!node.editing){
+      <span (dblclick)="toggleEditingNode(node)">
+      {{node.description}}
+    </span>
+    }@else {
+      <ng-container>
+      <mat-form-field appearance="fill">
+        <input type="text" matInput [(ngModel)]="node.description">  
+        <div matSuffix> 
+          <button mat-icon-button (click)="toggleEditingNode(node)"> 
+          <mat-icon>save</mat-icon> 
+        </button>                     
+          <button mat-icon-button (click)="toggleEditingNode(node)"> 
+          <mat-icon>close</mat-icon> 
+        </button>                     
+      </div>
+    </mat-form-field>    
+    </ng-container>
+    }
+
+    <ng-container *ngIf="!node.editing">
+    <!-- Botão add -->
+    @if(node.type !== 'SUBGROUP'){
+      <ng-container *ngTemplateOutlet="menuContext; context: { $implicit: node }"></ng-container>
+      } @else {
+        <button mat-icon-button (click)="editProductGrouping(node)">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button (click)="removeProductGrouping(node)">
+        <mat-icon>delete</mat-icon>
+      </button>
+      }
+    </ng-container>
+  </mat-tree-node>
+
+  <!-- Nó filho -->
+  <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+    <button mat-icon-button disabled></button>
+
+    @if(!node.editing){
+      <span (dblclick)="toggleEditingNode(node)">
+      {{node.description}}
+    </span>
+    }@else {
+      <ng-container>
+      <mat-form-field appearance="fill">
+        <input type="text" matInput [(ngModel)]="node.description">  
+        <div matSuffix> 
+          <button mat-icon-button (click)="toggleEditingNode(node)"> 
+          <mat-icon>save</mat-icon> 
+        </button>                     
+          <button mat-icon-button (click)="toggleEditingNode(node)"> 
+          <mat-icon>close</mat-icon> 
+        </button>                     
+      </div>
+    </mat-form-field>    
+    </ng-container>
+    }
+
+    <ng-container *ngIf="!node.editing">
+    <!-- Botão add -->
+    @if(node.type !== 'SUBGROUP'){
+      <ng-container *ngTemplateOutlet="menuContext; context: { $implicit: node }"></ng-container>
+      } @else {
+        <button mat-icon-button (click)="toggleEditingNode(node)">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button (click)="removeProductGrouping(node)">
+        <mat-icon>delete</mat-icon>
+      </button>
+      }
+    </ng-container>
+  </mat-tree-node>
+</mat-tree>
+
+<ng-template #menuContext let-node=>
+  <button mat-icon-button (click)="addProductGrouping(node)">
+    <mat-icon>add</mat-icon>
+  </button>
+  <button mat-icon-button (click)="toggleEditingNode(node)">
+    <mat-icon>edit</mat-icon>
+  </button>
+  <button mat-icon-button (click)="removeProductGrouping(node)">
+    <mat-icon>delete</mat-icon>
+  </button>
+</ng-template>
+
+
+<p>
+{{ consoleLog | json }}
+</p>
